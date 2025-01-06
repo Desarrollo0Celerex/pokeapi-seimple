@@ -27,7 +27,7 @@ function fetchPokemons(url, callback) {
 app.get("/", (req, res) => {
   fetchPokemons(POKE_API_URL, (data) => {
     if (!data) {
-      res.status(500).send("Failed to fetch Pokémon data1..");
+      res.status(500).send("Failed to fetch Pokémon data1.");
       return;
     }
 
