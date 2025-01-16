@@ -1,33 +1,52 @@
-const express = require("express");
-const https = require("https");
+import express, { Request, Response } from "express";
+import https from "https";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const POKE_API_URL = "https://pokeapi.co/api/v2/pokemon?limit=10"; // Fetch 10 Pokémon
 
-function fetchPokemons(url, callback) {
-  https
-    .get(url, (res) => {
-      let data = "";
-
-      res.on("data", (chunk) => {
-        data += chunk;
-      });
-
-      res.on("end", () => {
-        callback(JSON.parse(data));
-      });
-    })
-    .on("error", (err) => {
-      console.error("Error fetching Pokémon:", err);
-      callback(null);
-    });
+interface Pokemon {
+  name: string;
+  url: string;
 }
 
-app.get("/", (req, res) => {
-  fetchPokemons(POKE_API_URL, (data) => {
+interface PokemonAPIResponse {
+  results: Pokemon[];
+}
+
+function fetchPokemons(url: string): Promise<PokemonAPIResponse | null> {
+  return new Promise((resolve, reject) => {
+    https
+      .get(url, (res) => {
+        let data = "";
+
+        res.on("data", (chunk) => {
+          data += chunk;
+        });
+
+        res.on("end", () => {
+          try {
+            const parsedData = JSON.parse(data);
+            resolve(parsedData);
+          } catch (error) {
+            console.error("Error parsing Pokémon data:", error);
+            resolve(null);
+          }
+        });
+      })
+      .on("error", (err) => {
+        console.error("Error fetching Pokémon:", err);
+        resolve(null);
+      });
+  });
+}
+
+app.get("/", async (req: Request, res: Response) => {
+  try {
+    const data = await fetchPokemons(POKE_API_URL);
+
     if (!data) {
-      res.status(500).send("Failed to fetch Pokémon data1.");
+      res.status(500).send("Failed to fetch Pokémon data.");
       return;
     }
 
@@ -41,7 +60,7 @@ app.get("/", (req, res) => {
       )
       .join("");
 
-    const html = `
+      const html = `
       <!DOCTYPE html>
       <html lang="en">
       <head>
@@ -76,10 +95,13 @@ app.get("/", (req, res) => {
     `;
 
     res.send(html);
-  });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
-app.use((req, res) => {
+app.use((req: Request, res: Response) => {
   res.status(404).send("Not Found");
 });
 
