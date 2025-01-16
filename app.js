@@ -67,7 +67,7 @@ app.get("/", (req, res) => {
         </style>
       </head>
       <body>
-        <h1>Pokédex</h1>
+        <h1>Pokédex chingona</h1>
         <div>
           ${pokemonList}
         </div>
