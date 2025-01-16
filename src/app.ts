@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import https from "https";
+import { sum } from "./helpers/numbers";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -54,7 +55,7 @@ app.get("/", async (req: Request, res: Response) => {
       .map(
         (pokemon, index) => `
       <div class="pokemon">
-        <p><strong>#${index + 1} - ${pokemon.name}</strong></p>
+        <p><strong>#${index + 1} - ${pokemon.name} - ${sum(index + 1,2)}</strong></p>
       </div>
     `
       )
