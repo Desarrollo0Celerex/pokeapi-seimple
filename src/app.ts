@@ -87,7 +87,7 @@ app.get("/", async (req: Request, res: Response) => {
         </style>
       </head>
       <body>
-        <h1>Pokédex Pipeline 5</h1>
+        <h1>Pokédex Pipeline 6</h1>
         <div>
           ${pokemonList}
         </div>
